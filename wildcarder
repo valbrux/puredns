@@ -159,18 +159,22 @@ def load_massdns_cache(filename):
         exit(1)
 
     for line in massdns_file.read().splitlines():
-        entry = line.split(' ')
+        json_st = json.loads(line.strip())
+        try:
+            if(json_st["status"].strip() == "NOERROR"):
+                bind = {}
+                name = json_st["name"][:-1]
+                answers = json_st["data"]["answers"]
+                data = ""
+                for ans in answers:
+                    data = ans["data"]
+                    break
+                if(data == ""):
+                    continue
+                resolver.add_entry(name, data)
+        except Exception as exception:
+            pass
 
-        if len(entry) != 3:
-            continue
-
-        if entry[1] != 'CNAME' and entry[1] != 'A' and entry[1] != 'AAAA':
-            continue
-
-        domain = entry[0].rstrip('.')
-        answer = entry[2].rstrip('.')
-
-        resolver.add_entry(domain, answer)
 
     massdns_file.close()
 
