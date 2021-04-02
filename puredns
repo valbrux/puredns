@@ -354,7 +354,7 @@ invoke_massdns() {
 
 	printf "${COL_PV}" >&2
 	cat "${domains_file}" | pv "${pv_args[@]}" | "${massdns_bin}" -q -r "${resolvers}" -o J -t A -w "${massdns_outputfile}"
-	cat "${massdns_outputfile}" | jq -r 'select( .status | contains(\"NOERROR\")) | .name' |  sed 's/.$//'| sort -u > "${domains_outputfile}"
+	cat "${massdns_outputfile}" | jq -r "select( .status | contains(\"NOERROR\")) | .name" |  sed 's/.$//'| sort -u > "${domains_outputfile}"
 	printf "${COL_RESET}" >&2
 }
 
@@ -387,7 +387,7 @@ filter_wildcards_from_answers() {
 	cp "${tempfile_work}" "${massdns_work}"
 
 	# Extract valid domains
-	cat "${massdns_work}" | jq -r 'select( .status | contains(\"NOERROR\")) | .name' |  sed 's/.$//'| sort -u > "${domains_work}"
+	cat "${massdns_work}" | jq -r "select( .status | contains(\"NOERROR\")) | .name" |  sed 's/.$//'| sort -u > "${domains_work}"
 }
 
 cleanup_wildcards() {
